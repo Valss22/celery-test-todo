@@ -1,0 +1,13 @@
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
+.DS_Store
+.env
+.vscode
+.idea
+venv
+.mypy_cache
+.pytest_cache
