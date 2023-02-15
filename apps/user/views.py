@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -17,9 +17,19 @@ def user_login(request: Request):
     if user is not None:
         login(request, user)
         return Response(
-            {"message": "Authentication successful."}, status=status.HTTP_200_OK
+            {"message": "Authentication successful"},
+            status=status.HTTP_200_OK,
         )
-    else:
-        return Response(
-            {"message": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED
-        )
+    return Response(
+        {"message": "Invalid credentials"},
+        status=status.HTTP_401_UNAUTHORIZED,
+    )
+
+
+@api_view(["POST"])
+def user_logout(request: Request):
+    logout(request)
+    return Response(
+        {"message": "Logged out successfully"},
+        status=status.HTTP_200_OK,
+    )
