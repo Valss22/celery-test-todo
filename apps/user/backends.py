@@ -17,5 +17,6 @@ class EmailOrPhoneNumberBackend(ModelBackend):
                 user_profile = UserProfile.objects.get(phone_number=login)
             except UserProfile.DoesNotExist:
                 return None
+
         if user_profile.user.check_password(password):
             return user_profile.user
