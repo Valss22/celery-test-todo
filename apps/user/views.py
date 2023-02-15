@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import status
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
@@ -54,11 +55,10 @@ def password_reset(request: Request):
                 {"error": "No user found with that email address"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
-        user_id = user.pk
+        uidb64 = urlsafe_base64_encode(str(user.pk).encode())
         token = default_token_generator.make_token(user)
         reset_url = reverse(
-            "password_reset_confirm", kwargs={"user_id": user_id, "token": token}
+            "password_reset_confirm", kwargs={"uidb64": uidb64, "token": token}
         )
 
         email_subject = "Password Reset Requested"
@@ -81,13 +81,18 @@ def password_reset(request: Request):
 
 
 @api_view(["POST"])
-def password_reset_confirm(request: Request, user_id, token):
-    try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
-        user = None
+def password_reset_confirm(request: Request, uidb64, token):
+    decoded_uidb64 = urlsafe_base64_decode(uidb64).decode()
 
-    if user is not None and default_token_generator.check_token(user, token):
+    try:
+        user = User.objects.get(pk=decoded_uidb64)
+    except User.DoesNotExist:
+        return Response(
+            {"error": "User does not exists"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if default_token_generator.check_token(user, token):
         password = request.data.get("password")
 
         if password:

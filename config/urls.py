@@ -14,7 +14,7 @@ urlpatterns = [
     path("api/logout/", user_logout),
     path("api/password-reset/", password_reset),
     path(
-        "api/password-reset-confirm/<user_id>/<token>/",
+        "api/password-reset-confirm/<uidb64>/<token>/",
         password_reset_confirm,
         name="password_reset_confirm",
     ),
