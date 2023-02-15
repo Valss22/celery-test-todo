@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import PasswordChangeForm
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -33,3 +34,17 @@ def user_logout(request: Request):
         {"message": "Logged out successfully"},
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(["POST"])
+def user_password_change(request: Request):
+    form = PasswordChangeForm(user=request.user, data=request.data)
+
+    if form.is_valid():
+        form.save()
+        return Response(
+            {"message": "Password changed successfully"},
+            status=status.HTTP_200_OK,
+        )
+
+    return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)

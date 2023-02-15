@@ -8,6 +8,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/login/", user_login),
     path("api/logout/", user_logout),
-    path("api/password-reset/", PasswordResetView.as_view()),
-    path("reset/<uidb64>/<token>/", PasswordResetConfirmView.as_view()),
+    path(
+        "api/password-reset/", PasswordResetView.as_view(), name="password_reset_done"
+    ),
+    path("api/password-reset/<uidb64>/<token>/", PasswordResetConfirmView.as_view()),
 ]
