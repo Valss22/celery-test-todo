@@ -18,4 +18,4 @@ class EmailOrPhoneNumberBackend(ModelBackend):
             except UserProfile.DoesNotExist:
                 return None
         if user_profile.user.check_password(password):
-            return user_profile
+            return user_profile.user
