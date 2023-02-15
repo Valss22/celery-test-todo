@@ -1,9 +1,16 @@
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import PasswordChangeForm
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import status
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+
+from config.settings import EMAIL_HOST
 
 
 @api_view(["POST"])
@@ -37,14 +44,62 @@ def user_logout(request: Request):
 
 
 @api_view(["POST"])
-def user_password_change(request: Request):
-    form = PasswordChangeForm(user=request.user, data=request.data)
+def password_reset(request: Request):
+    email = request.data.get("email")
+    if email:
+        try:
+            user = User.objects.get(profile__email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "No user found with that email address"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
-    if form.is_valid():
-        form.save()
-        return Response(
-            {"message": "Password changed successfully"},
-            status=status.HTTP_200_OK,
+        user_id = user.pk
+        token = default_token_generator.make_token(user)
+        reset_url = reverse(
+            "password_reset_confirm", kwargs={"user_id": user_id, "token": token}
         )
 
-    return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+        email_subject = "Password Reset Requested"
+        email_body = f"Follow this link to set a new password:\n\n{reset_url}"
+
+        send_mail(
+            email_subject,
+            email_body,
+            EMAIL_HOST,
+            [email],
+        )
+        return Response(
+            {"success": "A password reset email has been sent"},
+            status=status.HTTP_200_OK,
+        )
+    return Response(
+        {"error": "An email address is required"},
+        status=status.HTTP_400_BAD_REQUEST,
+    )
+
+
+@api_view(["POST"])
+def password_reset_confirm(request: Request, user_id, token):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        password = request.data.get("password")
+
+        if password:
+            user.set_password(password)
+            user.save()
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+            return Response(
+                {"success": "Your password has been reset"},
+                status=status.HTTP_200_OK,
+            )
+        return Response(
+            {"error": "A password is required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    return Response({"error": "The reset password link is no longer valid"})
