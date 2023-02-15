@@ -14,6 +14,11 @@ ALLOWED_HOSTS = []
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
 
+AUTHENTICATION_BACKENDS = [
+    "apps.user.backends.EmailOrPhoneNumberBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
