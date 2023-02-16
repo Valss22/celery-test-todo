@@ -12,6 +12,7 @@ class EmailOrPhoneNumberBackend(ModelBackend):
     ):
         try:
             user_profile = UserProfile.objects.get(email=login)
+            print(user_profile)
         except UserProfile.DoesNotExist:
             try:
                 user_profile = UserProfile.objects.get(phone_number=login)
