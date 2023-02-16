@@ -8,7 +8,7 @@ from apps.user.views import (
     password_reset,
     password_reset_confirm,
 )
-from apps.todo.views import TaskViewSet
+from apps.todo.views import TaskViewSet, execute_task
 
 
 router = routers.DefaultRouter()
@@ -25,4 +25,5 @@ urlpatterns = [
         password_reset_confirm,
         name="password_reset_confirm",
     ),
+    path("api/todo/<int:id>/execute/", execute_task),
 ]
