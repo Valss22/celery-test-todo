@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Task(models.Model):
+    id = models.IntegerField(primary_key=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.TextField()

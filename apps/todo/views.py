@@ -9,7 +9,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == "create" or self.action == "update":
+        if self.action == "create" or self.action == "partial_update":
             return MutateTaskSerializer
         return TaskSerializer
 
@@ -17,4 +17,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Task.objects.filter(owner=self.request.user)
 
     def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
         serializer.save(owner=self.request.user)
