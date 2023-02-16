@@ -26,11 +26,11 @@ def user_login(request: Request):
     if user is not None:
         login(request, user)
         return Response(
-            {"message": "Authentication successful"},
+            {"detail": "Authentication successful"},
             status=status.HTTP_200_OK,
         )
     return Response(
-        {"message": "Invalid credentials"},
+        {"detail": "Invalid credentials"},
         status=status.HTTP_401_UNAUTHORIZED,
     )
 
@@ -39,7 +39,7 @@ def user_login(request: Request):
 def user_logout(request: Request):
     logout(request)
     return Response(
-        {"message": "Logged out successfully"},
+        {"detail": "Logged out successfully"},
         status=status.HTTP_200_OK,
     )
 
@@ -52,7 +52,7 @@ def password_reset(request: Request):
             user = User.objects.get(profile__email=email)
         except User.DoesNotExist:
             return Response(
-                {"error": "No user found with that email address"},
+                {"detail": "No user found with that email address"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         uidb64 = urlsafe_base64_encode(str(user.pk).encode())
@@ -71,11 +71,11 @@ def password_reset(request: Request):
             [email],
         )
         return Response(
-            {"success": "A password reset email has been sent"},
+            {"detail": "A password reset email has been sent"},
             status=status.HTTP_200_OK,
         )
     return Response(
-        {"error": "An email address is required"},
+        {"detail": "An email address is required"},
         status=status.HTTP_400_BAD_REQUEST,
     )
 
@@ -88,7 +88,7 @@ def password_reset_confirm(request: Request, uidb64, token):
         user = User.objects.get(pk=decoded_uidb64)
     except User.DoesNotExist:
         return Response(
-            {"error": "User does not exists"},
+            {"detail": "User does not exists"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -100,11 +100,11 @@ def password_reset_confirm(request: Request, uidb64, token):
             user.save()
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return Response(
-                {"success": "Your password has been reset"},
+                {"detail": "Your password has been reset"},
                 status=status.HTTP_200_OK,
             )
         return Response(
-            {"error": "A password is required"},
+            {"detail": "A password is required"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    return Response({"error": "The reset password link is no longer valid"})
+    return Response({"detail": "The reset password link is no longer valid"})
