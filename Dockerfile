@@ -8,11 +8,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-ENV PYTHONUNBUFFERED=1 \
-    REDIS_URL=redis://redis:6379/0 \
-    CELERY_BROKER_URL=redis://redis:6379/0 \
-    CELERY_RESULT_BACKEND=redis://redis:6379/0 \
-    DJANGO_SETTINGS_MODULE=config.settings
+ENV PYTHONUNBUFFERED=1 
 
 EXPOSE 8000
 
