@@ -23,7 +23,6 @@ def user_login(request: Request):
     user = authenticate(
         request, login=email if email else phone_number, password=password
     )
-    print(user)
     if user is not None:
         login(request, user)
         return Response(

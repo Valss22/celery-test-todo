@@ -1,9 +1,9 @@
 from django.core.mail import send_mail
-from celery import shared_task
 
 from config.settings import EMAIL_HOST
+from config.celery import app
 
 
-@shared_task()
+@app.task
 def send_email_task(subject: str, message: str, email_recipient: list[str]):
-    send_mail(subject, message, EMAIL_HOST, email_recipient)
+    send_mail(subject, message, EMAIL_HOST, email_recipient, fail_silently=False)

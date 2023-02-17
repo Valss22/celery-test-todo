@@ -37,13 +37,10 @@ def execute_task(request: Request, id: int):
             task = Task.objects.get(id=id, owner=request.user)
             task.done = done
             task.save()
-            send_email_task.apply_async(
-                args=(
-                    "Task",
-                    f"Your task {task.title} is done = {done}",
-                    [request.user.profile.email],
-                ),
-                queue="email",
+            send_email_task.delay(
+                "Task",
+                f"Your task {task.title} is done = {done}",
+                [request.user.profile.email],
             )
 
             return Response({"detail": "Task is executed"}, status.HTTP_200_OK)
