@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
+from apps.todo.celery_tasks import send_email_task
 from config.settings import EMAIL_HOST
 
 
@@ -64,12 +65,12 @@ def password_reset(request: Request):
         email_subject = "Password Reset Requested"
         email_body = f"Follow this link to set a new password:\n\n{reset_url}"
 
-        send_mail(
+        send_email_task.delay(
             email_subject,
             email_body,
-            EMAIL_HOST,
             [email],
         )
+
         return Response(
             {"detail": "A password reset email has been sent"},
             status=status.HTTP_200_OK,
