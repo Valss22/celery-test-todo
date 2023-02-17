@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .models import Task
-from .serializers import TaskSerializer, MutateTaskSerializer
+from .serializers import TaskSerializer, CreateOrUpdateTaskSerializer
 from .celery_tasks import send_email_task
 
 
@@ -15,7 +15,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "create" or self.action == "partial_update":
-            return MutateTaskSerializer
+            return CreateOrUpdateTaskSerializer
         return TaskSerializer
 
     def get_queryset(self):

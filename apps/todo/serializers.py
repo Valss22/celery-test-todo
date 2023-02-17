@@ -2,13 +2,7 @@ from rest_framework import serializers
 from .models import Task
 
 
-class TaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        exclude = ("owner",)
-
-
-class MutateTaskSerializer(serializers.ModelSerializer):
+class CreateOrUpdateTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         exclude = (
@@ -16,3 +10,8 @@ class MutateTaskSerializer(serializers.ModelSerializer):
             "done",
             "owner",
         )
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta(CreateOrUpdateTaskSerializer.Meta):
+        exclude = ("owner",)
